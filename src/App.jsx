@@ -143,6 +143,8 @@ function App() {
         "mdrs-voting-app-48ge98ighe",
       );
       if (!havingMainData && !havingNotaData) {
+        setVoterVotes([]);
+        setVotes(5);
         setPassword("");
         setIsResettingStorageData(false);
         setMessage({
@@ -225,7 +227,7 @@ function App() {
           >
             Counts
           </button>
-          {!isShowingResults && (
+          {!isShowingResults && votes !== 0 && (
             <button
               onClick={() => {
                 setIsResettingStorageData((prev) => !prev);
