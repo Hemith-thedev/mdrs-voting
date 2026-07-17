@@ -157,6 +157,7 @@ function App() {
             status: "",
           });
         }, 3000);
+        window.location.reload();
       } else {
         setPassword("");
         setIsResettingStorageData(false);
