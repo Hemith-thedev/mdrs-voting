@@ -88,6 +88,10 @@ function App() {
         status: "success",
       });
       playAudio();
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }
   }, [votes]);
   const onNotaSelect = () => {
@@ -109,6 +113,11 @@ function App() {
       localStorage.setItem("mdrs-voting-app-48ge98ighe", 1);
       setNotaCount(1);
     }
+    playAudio();
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
   const reset = () => {
     setVotes(5);
