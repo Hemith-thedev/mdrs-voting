@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@layer {
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+  h3 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+  code {
+    @apply bg-gray-200 p-2 font-mono;
+  }
+  .primary-btn {
+    @apply h-fit w-fit cursor-pointer rounded-xl bg-gray-100 px-4 py-2 text-gray-500;
+    &.violet {
+      @apply bg-violet-100 text-violet-500;
+    }
+    &.indigo {
+      @apply bg-indigo-100 text-indigo-500;
+    }
+    &.blue {
+      @apply bg-blue-100 text-blue-500;
+    }
+    &.green {
+      @apply bg-green-100 text-green-500;
+    }
+    &.yellow {
+      @apply bg-yellow-100 text-yellow-600;
+    }
+    &.orange {
+      @apply bg-orange-100 text-orange-500;
+    }
+    &.red {
+      @apply bg-red-100 text-red-500;
+    }
+  }
+  input {
+    @apply rounded-xl border border-blue-300 p-2 ring-0 ring-blue-300 outline-none bg-gray-200/80 focus-visible:border-blue-500 backdrop-blur-xl focus-visible:ring-4 transition-all;
+  }
+}
+
+/* Parent CSS */
+.shadow-host {
+  --span-font-size: 12px; /* Ikkada value set cheyyi */
+}
+
+/* Shadow DOM lopaliki */
+span {
+  font-size: var(--span-font-size);
+}
