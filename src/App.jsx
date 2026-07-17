@@ -201,6 +201,10 @@ function App() {
         }, 3000);
       }
     }
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }, [password]);
   const playAudio = () => {
     if (audioRef.current) {
@@ -275,6 +279,10 @@ function App() {
                   setIsShowingCount(false);
                   setIsShowingResults(false);
                   setPassword("");
+                  window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                  });
                 }}
                 className="primary-btn red"
               >
