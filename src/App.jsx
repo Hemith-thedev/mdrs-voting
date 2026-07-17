@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./App.css";
 import Data from "./data/data";
 import { MAIN_DATA_PASSWORD, NOTA_DATA_PASSWORD } from "./data/passwords";
@@ -16,6 +16,7 @@ function App() {
   const [isShowingResults, setIsShowingResults] = useState(false);
   const [notaCount, setNotaCount] = useState(0);
   const [isResettingStorageData, setIsResettingStorageData] = useState(false);
+  const audioRef = useRef(null);
   useEffect(() => {
     const storedData = localStorage.getItem("mdrs-voting-app-48ge98ighe");
     if (storedData) {
@@ -170,8 +171,14 @@ function App() {
       }
     }
   }, [password]);
+  const playAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.play();
+    }
+  };
   return (
     <main className="app relative flex min-h-screen w-full flex-col items-center justify-start bg-gray-200 px-4 pb-4 select-none">
+      <audio ref={audioRef} src="/beep.mp3" />
       <h3 className="pt-10 pb-5 text-center font-bold text-gray-700 uppercase">
         Morarji Desai Residential School
       </h3>
@@ -218,16 +225,18 @@ function App() {
           >
             Counts
           </button>
-          {!isShowingResults && <button
-            onClick={() => {
-              setIsResettingStorageData((prev) => !prev);
-              setIsResetting(false);
-              setIsShowingCount(false);
-            }}
-            className="primary-btn red h-full!"
-          >
-            Reset Storage
-          </button>}
+          {!isShowingResults && (
+            <button
+              onClick={() => {
+                setIsResettingStorageData((prev) => !prev);
+                setIsResetting(false);
+                setIsShowingCount(false);
+              }}
+              className="primary-btn red h-full!"
+            >
+              Reset Storage
+            </button>
+          )}
           {isShowingResults && (
             <button
               onClick={() => {
@@ -261,9 +270,9 @@ function App() {
             >
               <p className="font-bold">{idx + 1}.</p>
               <div className="flex flex-col items-center justify-start">
-                <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 bg-green-500">
+                <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
                   <img
-                    src="/logo.jpg"
+                    src={`/candidate_symbols/${party.name.toLowerCase()}.jpg`}
                     alt={party.name}
                     className="h-full w-full object-cover"
                   />
@@ -285,9 +294,9 @@ function App() {
           <li className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl">
             <p className="font-bold">21.</p>
             <div className="flex flex-col items-center justify-start">
-              <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 bg-green-500">
+              <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
                 <img
-                  src="/logo.jpg"
+                  src="/candidate_symbols/nota.jpg"
                   alt="Nota"
                   className="h-full w-full object-cover"
                 />
@@ -332,7 +341,10 @@ function App() {
               </div>
               <button
                 className="primary-btn blue"
-                onClick={() => AddThisParty(party)}
+                onClick={() => {
+                  playAudio();
+                  AddThisParty(party);
+                }}
               >
                 Vote
               </button>
