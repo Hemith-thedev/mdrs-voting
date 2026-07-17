@@ -282,32 +282,34 @@ function App() {
               </button>
             </li>
           ))}
-          <li className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl">
-            <p className="font-bold">21.</p>
-            <div className="flex flex-col items-center justify-start">
-              <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 bg-green-500">
-                <img
-                  src="/logo.jpg"
-                  alt="Nota"
-                  className="h-full w-full object-cover"
-                />
+          {!isShowingResults && (
+            <li className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl">
+              <p className="font-bold">21.</p>
+              <div className="flex flex-col items-center justify-start">
+                <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 bg-green-500">
+                  <img
+                    src="/logo.jpg"
+                    alt="Nota"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <p className="">Nota</p>
               </div>
-              <p className="">Nota</p>
-            </div>
-            <div className="flex h-full w-full flex-col items-start justify-center">
-              <p>
-                <b>none</b>
-              </p>
-              <p>Class: none</p>
-            </div>
-            <button
-              className={`primary-btn blue`}
-              onClick={onNotaSelect}
-              disabled={votes === 0}
-            >
-              Vote
-            </button>
-          </li>
+              <div className="flex h-full w-full flex-col items-start justify-center">
+                <p>
+                  <b>none</b>
+                </p>
+                <p>Class: none</p>
+              </div>
+              <button
+                className={`primary-btn blue`}
+                onClick={onNotaSelect}
+                disabled={votes === 0}
+              >
+                Vote
+              </button>
+            </li>
+          )}
         </ul>
       )}
 
