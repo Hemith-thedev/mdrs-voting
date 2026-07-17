@@ -87,6 +87,7 @@ function App() {
         label: "Voting done... next please!😌",
         status: "success",
       });
+      playAudio();
     }
   }, [votes]);
   const onNotaSelect = () => {
@@ -112,7 +113,7 @@ function App() {
   const reset = () => {
     setVotes(5);
     setMessage({
-      label: "New data generated! start voting😌",
+      label: "New data generated! start voting😇",
       status: "success",
     });
     setPassword("");
@@ -126,6 +127,24 @@ function App() {
     setIsNotaClicked(false);
     setIsResetting(false);
   };
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      // Voting jarugutunnappudu mathrame ee warning chupinchali
+      if (votes < 5 && votes > 0) {
+        event.preventDefault();
+        // Modern browsers lo ee string prastutam chupinchav,
+        // kani browser default dialog mathram compulsory ga ostundi.
+        event.returnValue = "Are you sure? You have unsaved votes! 😟";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Cleanup: Component unmount ayyaka listener ni remove cheyali
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [votes]); // votes change ayyinappudalla check chestundi
   useEffect(() => {
     if (password === MAIN_DATA_PASSWORD && isResetting) {
       reset();
@@ -180,180 +199,123 @@ function App() {
     }
   };
   return (
-    <main className="app relative flex min-h-screen w-full flex-col items-center justify-start bg-gray-200 px-4 pb-4 select-none">
+    <main className="app relative flex min-h-screen w-full flex-col items-center justify-start gap-4 bg-gray-200 pb-4 select-none">
       <audio ref={audioRef} src="/beep.mp3" />
-      <h3 className="pt-10 pb-5 text-center font-bold text-gray-700 uppercase">
-        Morarji Desai Residential School
-      </h3>
-      <h4 className="text-center">Adakamaranahalli, Bangalore</h4>
-      <p className="mb-4 text-center uppercase">
-        School Parliament Election: 2026-27
-      </p>
-      <div className="sticky top-24 z-50 mb-4 flex h-fit w-fit flex-col items-center justify-start gap-4">
-        <div className="flex h-fit w-fit items-center justify-center gap-4">
-          {isShowingResults ? (
-            <p className="rounded-xl bg-orange-200/90 px-4 py-3 font-bold text-orange-600 backdrop-blur-xl">
-              Results
-            </p>
-          ) : (
-            <p
-              className={`bg-linear-to-br from-gray-200/90 to-gray-400/90 px-4 py-3 backdrop-blur-xl ${votes === 0 ? "text-green-600" : "text-gray-800"} rounded-xl font-bold`}
-            >
-              Votes: {votes}
-            </p>
-          )}
-          {votes === 0 && (
-            <>
-              {!isShowingResults && (
-                <button
-                  onClick={() => {
-                    setIsResetting((prev) => !prev);
-                    setIsShowingCount(false);
-                    setIsResettingStorageData(false);
-                  }}
-                  className="primary-btn red h-full!"
-                >
-                  Reset
-                </button>
-              )}
-            </>
-          )}
-          <button
-            onClick={() => {
-              setIsShowingCount((prev) => !prev);
-              setIsResetting(false);
-              setIsResettingStorageData(false);
-            }}
-            className="primary-btn orange h-full!"
-          >
-            Counts
-          </button>
-          {!isShowingResults && votes !== 0 && (
+      <div className="sticky top-0 z-50 flex h-fit w-full flex-col items-center justify-start rounded-b-3xl bg-gray-200/50 shadow-xl backdrop-blur-xl">
+        <h3 className="pt-8 text-center font-bold text-green-800 uppercase">
+          Morarji Desai Residential School
+        </h3>
+        <h4 className="pb-5 text-center italic">Adakamaranahalli, Bangalore</h4>
+        <p className="mb-4 text-center font-bold uppercase">
+          School Parliament Election: 2026-27
+        </p>
+        <div className="sticky top-24 z-50 mb-4 flex h-fit w-fit flex-col items-center justify-start gap-4">
+          <div className="flex h-fit w-fit items-center justify-center gap-4">
+            {isShowingResults ? (
+              <p className="rounded-xl bg-orange-200/90 px-4 py-3 font-bold text-orange-600 backdrop-blur-xl">
+                Results
+              </p>
+            ) : (
+              <p
+                className={`bg-linear-to-br from-gray-200/90 to-gray-400/90 px-4 py-3 backdrop-blur-xl ${votes === 0 ? "text-green-600" : "text-gray-800"} rounded-xl font-bold`}
+              >
+                Votes: {votes}
+              </p>
+            )}
+            {votes === 0 && (
+              <>
+                {!isShowingResults && (
+                  <button
+                    onClick={() => {
+                      setIsResetting((prev) => !prev);
+                      setIsShowingCount(false);
+                      setIsResettingStorageData(false);
+                    }}
+                    className="primary-btn red h-full!"
+                  >
+                    Reset
+                  </button>
+                )}
+              </>
+            )}
             <button
               onClick={() => {
-                setIsResettingStorageData((prev) => !prev);
+                setIsShowingCount((prev) => !prev);
                 setIsResetting(false);
-                setIsShowingCount(false);
+                setIsResettingStorageData(false);
               }}
-              className="primary-btn red h-full!"
+              className="primary-btn orange h-full!"
             >
-              Reset Storage
+              Counts
             </button>
-          )}
-          {isShowingResults && (
-            <button
-              onClick={() => {
-                setIsShowingCount(false);
-                setIsShowingResults(false);
-                setPassword("");
-              }}
-              className="primary-btn red"
-            >
-              Close
-            </button>
-          )}
+            {!isShowingResults && votes !== 0 && (
+              <button
+                onClick={() => {
+                  setIsResettingStorageData((prev) => !prev);
+                  setIsResetting(false);
+                  setIsShowingCount(false);
+                }}
+                className="primary-btn red h-full!"
+              >
+                Reset Storage
+              </button>
+            )}
+            {isShowingResults && (
+              <button
+                onClick={() => {
+                  setIsShowingCount(false);
+                  setIsShowingResults(false);
+                  setPassword("");
+                }}
+                className="primary-btn red"
+              >
+                Close
+              </button>
+            )}
+          </div>
+          {(isResetting || isShowingCount || isResettingStorageData) &&
+            !isShowingResults && (
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={placeholder}
+              />
+            )}
         </div>
-        {(isResetting || isShowingCount || isResettingStorageData) &&
-          !isShowingResults && (
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={placeholder}
-            />
-          )}
       </div>
 
-      {isShowingResults ? (
-        <ul className="flex h-fit w-full flex-col items-center justify-start gap-4 rounded-3xl bg-gray-300 p-4">
-          {parties.map((party, idx) => (
-            <li
-              key={idx}
-              className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl"
-            >
-              <p className="font-bold">{idx + 1}.</p>
-              <div className="flex flex-col items-center justify-start">
-                <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
-                  <img
-                    src={`/candidate_symbols/${party.name.toLowerCase()}.jpg`}
-                    alt={party.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <p className="">{party.name}</p>
-              </div>
-              <div className="flex h-full w-full flex-col items-start justify-center">
-                <p>
-                  <b>{party.sudent_name}</b>
-                </p>
-                <p>Class: {party.class}th</p>
-              </div>
-              <div className="flex flex-col items-center justify-center rounded-xl bg-purple-300 p-4">
-                <p>Votes</p>
-                <p>{party.votes}</p>
-              </div>
-            </li>
-          ))}
-          <li className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl">
-            <p className="font-bold">21.</p>
-            <div className="flex flex-col items-center justify-start">
-              <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
-                <img
-                  src="/candidate_symbols/nota.jpg"
-                  alt="Nota"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <p className="">Nota</p>
-            </div>
-            <div className="flex h-full w-full flex-col items-start justify-center">
-              <p>
-                <b>none</b>
-              </p>
-              <p>Class: none</p>
-            </div>
-            <div className="flex flex-col items-center justify-center rounded-xl bg-purple-300 p-4">
-              <p>Count</p>
-              <p>{notaCount}</p>
-            </div>
-          </li>
-        </ul>
-      ) : (
-        <ul className="flex h-fit w-full flex-col items-center justify-start gap-4 rounded-3xl bg-gray-300 p-4">
-          {parties.map((party, idx) => (
-            <li
-              key={idx}
-              className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl"
-            >
-              <p className="font-bold">{idx + 1}.</p>
-              <div className="flex flex-col items-center justify-start">
-                <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
-                  <img
-                    src={`/candidate_symbols/${party.name.toLowerCase()}.jpg`}
-                    alt={party.name}
-                    className="h-full w-full object-cover mix-blend-multiply"
-                  />
-                </div>
-                <p className="">{party.name}</p>
-              </div>
-              <div className="flex h-full w-full flex-col items-start justify-center">
-                <p>
-                  <b>{party.sudent_name}</b>
-                </p>
-                <p>Class: {party.class}th</p>
-              </div>
-              <button
-                className="primary-btn blue"
-                onClick={() => {
-                  playAudio();
-                  AddThisParty(party);
-                }}
+      <div className="flex h-fit w-full px-4">
+        {isShowingResults ? (
+          <ul className="flex h-fit w-full flex-col items-center justify-start gap-4 rounded-3xl bg-gray-300 p-4">
+            {parties.map((party, idx) => (
+              <li
+                key={idx}
+                className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl"
               >
-                Vote
-              </button>
-            </li>
-          ))}
-          {!isShowingResults && (
+                <p className="font-bold">{idx + 1}.</p>
+                <div className="flex flex-col items-center justify-start">
+                  <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
+                    <img
+                      src={`/candidate_symbols/${party.name.toLowerCase()}.jpg`}
+                      alt={party.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <p className="">{party.name}</p>
+                </div>
+                <div className="flex h-full w-full flex-col items-start justify-center">
+                  <p>
+                    <b>{party.sudent_name}</b>
+                  </p>
+                  <p>Class: {party.class}th</p>
+                </div>
+                <div className="flex flex-col items-center justify-center rounded-xl bg-purple-300 p-4">
+                  <p className="font-bold text-purple-800">Votes</p>
+                  <p className="font-bold text-purple-600">{party.votes}</p>
+                </div>
+              </li>
+            ))}
             <li className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl">
               <p className="font-bold">21.</p>
               <div className="flex flex-col items-center justify-start">
@@ -361,7 +323,7 @@ function App() {
                   <img
                     src="/candidate_symbols/nota.jpg"
                     alt="Nota"
-                    className="h-full w-full object-cover mix-blend-multiply"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <p className="">Nota</p>
@@ -372,17 +334,77 @@ function App() {
                 </p>
                 <p>Class: none</p>
               </div>
-              <button
-                className={`primary-btn blue`}
-                onClick={onNotaSelect}
-                disabled={votes === 0}
-              >
-                Vote
-              </button>
+              <div className="flex flex-col items-center justify-center rounded-xl bg-purple-300 p-4">
+                <p className="font-bold text-purple-800">Count</p>
+                <p className="font-bold text-purple-600">{notaCount}</p>
+              </div>
             </li>
-          )}
-        </ul>
-      )}
+          </ul>
+        ) : (
+          <ul className="flex h-fit w-full flex-col items-center justify-start gap-4 rounded-3xl bg-gray-300 p-4">
+            {parties.map((party, idx) => (
+              <li
+                key={idx}
+                className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl"
+              >
+                <p className="font-bold">{idx + 1}.</p>
+                <div className="flex flex-col items-center justify-start">
+                  <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
+                    <img
+                      src={`/candidate_symbols/${party.name.toLowerCase()}.jpg`}
+                      alt={party.name}
+                      className="h-full w-full object-cover mix-blend-multiply"
+                    />
+                  </div>
+                  <p className="">{party.name}</p>
+                </div>
+                <div className="flex h-full w-full flex-col items-start justify-center">
+                  <p>
+                    <b>{party.sudent_name}</b>
+                  </p>
+                  <p>Class: {party.class}th</p>
+                </div>
+                <button
+                  className="primary-btn blue"
+                  onClick={() => {
+                    AddThisParty(party);
+                  }}
+                >
+                  Vote
+                </button>
+              </li>
+            ))}
+            {!isShowingResults && (
+              <li className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl">
+                <p className="font-bold">21.</p>
+                <div className="flex flex-col items-center justify-start">
+                  <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
+                    <img
+                      src="/candidate_symbols/nota.jpg"
+                      alt="Nota"
+                      className="h-full w-full object-cover mix-blend-multiply"
+                    />
+                  </div>
+                  <p className="">Nota</p>
+                </div>
+                <div className="flex h-full w-full flex-col items-start justify-center">
+                  <p>
+                    <b>none</b>
+                  </p>
+                  <p>Class: none</p>
+                </div>
+                <button
+                  className={`primary-btn blue`}
+                  onClick={onNotaSelect}
+                  disabled={votes === 0}
+                >
+                  Vote
+                </button>
+              </li>
+            )}
+          </ul>
+        )}
+      </div>
 
       <div
         className={`fixed top-0 left-1/2 z-50 h-fit w-full -translate-x-1/2 p-4 ${message.label !== "" ? "" : "-translate-20"} transition-transform`}

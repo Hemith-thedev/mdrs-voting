@@ -51,3 +51,6 @@
 span {
   font-size: var(--span-font-size);
 }
+body {
+  overscroll-behavior-y: contain;
+}
