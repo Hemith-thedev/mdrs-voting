@@ -1,0 +1,2 @@
+export const MAIN_DATA_PASSWORD = "143277";
+export const NOTA_DATA_PASSWORD = "678942";

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import Data from "./data/data";
-import PASSWORD from "./data/password";
+import { MAIN_DATA_PASSWORD, NOTA_DATA_PASSWORD } from "./data/passwords";
 
 function App() {
   const [votes, setVotes] = useState(5);
@@ -15,10 +15,11 @@ function App() {
   const [placeholder, setPlaceholder] = useState("Password");
   const [isShowingResults, setIsShowingResults] = useState(false);
   const [notaCount, setNotaCount] = useState(0);
+  const [isResettingStorageData, setIsResettingStorageData] = useState(false);
   useEffect(() => {
     const storedData = localStorage.getItem("mdrs-voting-app-48ge98ighe");
     if (storedData) {
-      console.log(storedData, typeof storedData);
+      setNotaCount(storedData);
     } else {
       localStorage.setItem("mdrs-voting-app-48ge98ighe", 0);
       setNotaCount(0);
@@ -101,8 +102,10 @@ function App() {
         "mdrs-voting-app-48ge98ighe",
         Number(storedCount) + 1,
       );
+      setNotaCount(Number(storedCount) + 1);
     } else {
-      localStorage.setItem("mdrs-voting-app-48ge98ighe", 0);
+      localStorage.setItem("mdrs-voting-app-48ge98ighe", 1);
+      setNotaCount(1);
     }
   };
   const reset = () => {
@@ -123,11 +126,48 @@ function App() {
     setIsResetting(false);
   };
   useEffect(() => {
-    if (password === PASSWORD && isResetting) {
+    if (password === MAIN_DATA_PASSWORD && isResetting) {
       reset();
     }
-    if (password === PASSWORD && isShowingCount) {
+    if (password === MAIN_DATA_PASSWORD && isShowingCount) {
       setIsShowingResults(true);
+    }
+    if (password === NOTA_DATA_PASSWORD && isResettingStorageData) {
+      localStorage.removeItem("mdrs-voting-app-er09herv9hwrj");
+      localStorage.removeItem("mdrs-voting-app-48ge98ighe");
+      const havingMainData = localStorage.removeItem(
+        "mdrs-voting-app-er09herv9hwrj",
+      );
+      const havingNotaData = localStorage.removeItem(
+        "mdrs-voting-app-48ge98ighe",
+      );
+      if (!havingMainData && !havingNotaData) {
+        setPassword("");
+        setIsResettingStorageData(false);
+        setMessage({
+          label: "Votes Data Reset done!🥳",
+          status: "success",
+        });
+        setTimeout(() => {
+          setMessage({
+            label: "",
+            status: "",
+          });
+        }, 3000);
+      } else {
+        setPassword("");
+        setIsResettingStorageData(false);
+        setMessage({
+          label: "Votes Data Reset failed!😭",
+          status: "error",
+        });
+        setTimeout(() => {
+          setMessage({
+            label: "",
+            status: "",
+          });
+        }, 3000);
+      }
     }
   }, [password]);
   return (
@@ -137,9 +177,9 @@ function App() {
       </h3>
       <h4 className="text-center">Adakamaranahalli, Bangalore</h4>
       <p className="mb-4 text-center uppercase">
-        School Parliment Election: 2026-27
+        School Parliament Election: 2026-27
       </p>
-      <div className="sticky top-18 mb-4 flex h-fit w-fit flex-col items-center justify-start gap-4">
+      <div className="sticky top-24 z-50 mb-4 flex h-fit w-fit flex-col items-center justify-start gap-4">
         <div className="flex h-fit w-fit items-center justify-center gap-4">
           {isShowingResults ? (
             <p className="rounded-xl bg-orange-200/90 px-4 py-3 font-bold text-orange-600 backdrop-blur-xl">
@@ -156,7 +196,11 @@ function App() {
             <>
               {!isShowingResults && (
                 <button
-                  onClick={() => setIsResetting(true)}
+                  onClick={() => {
+                    setIsResetting((prev) => !prev);
+                    setIsShowingCount(false);
+                    setIsResettingStorageData(false);
+                  }}
                   className="primary-btn red h-full!"
                 >
                   Reset
@@ -165,11 +209,25 @@ function App() {
             </>
           )}
           <button
-            onClick={() => setIsShowingCount((prev) => !prev)}
+            onClick={() => {
+              setIsShowingCount((prev) => !prev);
+              setIsResetting(false);
+              setIsResettingStorageData(false);
+            }}
             className="primary-btn orange h-full!"
           >
             Counts
           </button>
+          {!isShowingResults && <button
+            onClick={() => {
+              setIsResettingStorageData((prev) => !prev);
+              setIsResetting(false);
+              setIsShowingCount(false);
+            }}
+            className="primary-btn red h-full!"
+          >
+            Reset Storage
+          </button>}
           {isShowingResults && (
             <button
               onClick={() => {
@@ -183,14 +241,15 @@ function App() {
             </button>
           )}
         </div>
-        {(isResetting || isShowingCount) && !isShowingResults && (
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={placeholder}
-          />
-        )}
+        {(isResetting || isShowingCount || isResettingStorageData) &&
+          !isShowingResults && (
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={placeholder}
+            />
+          )}
       </div>
 
       {isShowingResults ? (
@@ -241,13 +300,10 @@ function App() {
               </p>
               <p>Class: none</p>
             </div>
-            <button
-              className={`primary-btn blue`}
-              onClick={onNotaSelect}
-              disabled={votes === 0}
-            >
-              Vote
-            </button>
+            <div className="flex flex-col items-center justify-center rounded-xl bg-purple-300 p-4">
+              <p>Count</p>
+              <p>{notaCount}</p>
+            </div>
           </li>
         </ul>
       ) : (
@@ -259,11 +315,11 @@ function App() {
             >
               <p className="font-bold">{idx + 1}.</p>
               <div className="flex flex-col items-center justify-start">
-                <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 bg-green-500">
+                <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
                   <img
-                    src="/logo.jpg"
+                    src={`/candidate_symbols/${party.name.toLowerCase()}.jpg`}
                     alt={party.name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover mix-blend-multiply"
                   />
                 </div>
                 <p className="">{party.name}</p>
@@ -286,11 +342,11 @@ function App() {
             <li className="flex h-fit w-full items-center justify-start gap-4 rounded-2xl">
               <p className="font-bold">21.</p>
               <div className="flex flex-col items-center justify-start">
-                <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 bg-green-500">
+                <div className="flex max-h-18 min-h-18 max-w-18 min-w-18 items-center justify-center">
                   <img
-                    src="/logo.jpg"
+                    src="/candidate_symbols/nota.jpg"
                     alt="Nota"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover mix-blend-multiply"
                   />
                 </div>
                 <p className="">Nota</p>
