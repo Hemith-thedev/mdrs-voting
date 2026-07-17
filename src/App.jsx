@@ -165,7 +165,7 @@ function App() {
             </>
           )}
           <button
-            onClick={() => setIsShowingCount(true)}
+            onClick={() => setIsShowingCount((prev) => !prev)}
             className="primary-btn orange h-full!"
           >
             Counts
